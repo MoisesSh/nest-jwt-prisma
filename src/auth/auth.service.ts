@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
   async singIn(
     singInAuthDto: singInAuthDto,
-  ): Promise<{ payload: any; access_token: string }> {
+  ): Promise<{id:number, access_token: string }> {
     const { email, password } = singInAuthDto;
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -37,7 +37,7 @@ export class AuthService {
       },
     });
     return {
-      payload: payload,
+      id: user.user_Id,
       access_token: token,
     };
   }
@@ -70,7 +70,7 @@ export class AuthService {
     }
     return oneUser;
   }
-  async refreshToken(request: Request, response: Response) {
+  async refreshToken(request: Request, response: Response,) {
     const [type, getToken] = request.headers.authorization?.split(' ') ?? [];
     if (!type || !getToken) {
       throw new HttpException('No hay token', HttpStatus.UNAUTHORIZED);
@@ -98,13 +98,14 @@ export class AuthService {
         name: oldToken.authenticationUser.name,
         email: oldToken.authenticationUser.email,
         id: oldToken.authenticationUser.user_Id,
+        password: oldToken.authenticationUser.passwordHash,
       };
       const newToken = await this.jwtService.signAsync(newPayload);
       const newHash = hashToken(newToken);
       await tx.authentication.update({
         where: { token: tokenHash },
         data: {
-          token: newHash,
+          token: tokenHash,
           expiresAt: new Date(Date.now() + 1000 * 60 * 30),
           revoked: true,
         },
@@ -113,6 +114,7 @@ export class AuthService {
         data: {
           token: newHash,
           expiresAt: new Date(Date.now() + 1000 * 60 * 30),
+          user_Id: oldToken.authenticationUser.user_Id,
         },
       });
 

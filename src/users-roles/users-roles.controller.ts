@@ -11,6 +11,9 @@ import {
 import { UsersRolesService } from './users-roles.service';
 import { CreateUsersRoleDto } from './dto/create-users-role.dto';
 import { UpdateUsersRoleDto } from './dto/update-users-role.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+@ApiTags("Roles by User")
+@ApiBearerAuth()
 
 @Controller('users-roles')
 export class UsersRolesController {

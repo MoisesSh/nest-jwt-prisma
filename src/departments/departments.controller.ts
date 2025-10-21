@@ -16,6 +16,9 @@ import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { AuthGuard } from 'src/auth/guard/guard.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+@ApiTags("Departments")
+@ApiBearerAuth()
 
 @Controller('departments')
 export class DepartmentsController {

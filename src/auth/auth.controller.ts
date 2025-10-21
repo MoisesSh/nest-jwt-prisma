@@ -18,7 +18,9 @@ import { AuthGuard } from './guard/guard.guard';
 import { Public } from 'src/common/decorator_public';
 import { Request, Response } from 'express';
 import { RefreshTokenGuardGuard } from './refresh-token-guard/refresh-token-guard.guard';
-
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+@ApiBearerAuth()
+@ApiTags("Auth")
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -40,7 +42,7 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuardGuard)
   @Public()
-  async refreshToken(@Req() request: Request, @Res() response: Response) {
+  async refreshToken(@Req() request: Request, @Res() response: Response,) {
     return await this.authService.refreshToken(request, response);
   }
 

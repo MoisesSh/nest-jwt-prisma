@@ -13,6 +13,9 @@ import { UserDepartmentService } from './user-department.service';
 import { CreateUserDepartmentDto } from './dto/create-user-department.dto';
 import { UpdateUserDepartmentDto } from './dto/update-user-department.dto';
 import { AuthGuard } from 'src/auth/guard/guard.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+@ApiTags("Department by User")
+@ApiBearerAuth()
 
 @Controller('user-department')
 export class UserDepartmentController {

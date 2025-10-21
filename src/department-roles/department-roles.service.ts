@@ -77,18 +77,19 @@ export class DepartmentRolesService {
 
   async update(
     deparment_Id: number,
-    role_Id: number,
+    role_id_old: number,
+    new_role
   ): Promise<ApiResponse<Role_Departments>> {
     const deparmentsWithRole = await this.prisma.role_Departments.update({
       where: {
         role_Id_department_Id: {
           department_Id: deparment_Id,
-          role_Id: role_Id,
+          role_Id: role_id_old,
         },
       },
       data: {
         department_Id: deparment_Id,
-        role_Id: role_Id,
+        role_Id: new_role,
       },
       include: {
         departmentRole: true,

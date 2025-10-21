@@ -12,6 +12,9 @@ import {
 import { DepartmentRolesService } from './department-roles.service';
 import { CreateDepartmentRoleDto } from './dto/create-department-role.dto';
 import { AuthGuard } from 'src/auth/guard/guard.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+@ApiTags("Department Roles")
+@ApiBearerAuth()
 
 @Controller('department-roles')
 export class DepartmentRolesController {
@@ -29,7 +32,7 @@ export class DepartmentRolesController {
     return this.departmentRolesService.findAll();
   }
 
-  @Get(':id')
+  @Get(':role_id/:deparment_id')
   findOne(
     @Param('deparment_id', ParseIntPipe) deparment_id: number,
     @Param('role_id', ParseIntPipe) role_id: number,
@@ -37,14 +40,15 @@ export class DepartmentRolesController {
     return this.departmentRolesService.findOne(deparment_id, role_id);
   }
 
-  @Patch(':id')
+  @Patch(':deparment_id/:role_id_old/:new_role')
   update(
     @Param('deparment_id', ParseIntPipe) deparment_id: number,
-    @Param('role_id', ParseIntPipe) role_id: number,
+    @Param('role_id_old', ParseIntPipe) role_id_old: number,
+    @Param('new_role', ParseIntPipe) new_role: number,
   ) {
-    return this.departmentRolesService.update(deparment_id, role_id);
+    return this.departmentRolesService.update(deparment_id, role_id_old,new_role);
   }
-  @Delete(':id')
+  @Delete(':deparment_id/:role_id')
   remove(
     @Param('deparment_id', ParseIntPipe) deparment_id: number,
     @Param('role_id', ParseIntPipe) role_id: number,
