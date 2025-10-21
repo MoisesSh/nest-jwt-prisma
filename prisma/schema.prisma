@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_Id Int @id @default(autoincrement())
+  name String
+  lastname String
+  email String @unique
+  passwordHash String
+  departmentUser Departments_Users[] @relation("UserInDepartment")
+  UserRole Role_Users[] @relation("UserInRoles")
+  authenticationUser Authentication[] @relation("UserInAuthentication")
+  BeforePasswordUser Before_password[] @relation("BeforePass")
+}
+
+model Departments {
+  department_Id Int @id @default(autoincrement())
+  departmentUser Departments_Users[] @relation("DepartmentByUser")
+  name_department String @unique 
+  departmentRole Role_Departments[] @relation("DepartmentByRole")
+}
+
+model Departments_Users {
+  department_user_id Int @id @default(autoincrement())
+  department_Id Int
+  departmentId Departments @relation("DepartmentByUser", fields: [department_Id], references: [department_Id])
+  user_Id Int
+  departmentUser User @relation("UserInDepartment",fields: [user_Id], references:[user_Id])
+  @@unique([department_Id,user_Id])
+}
+model Role {
+  role_Id Int @id @default(autoincrement())
+  name_role String @unique
+  roledepartments Role_Departments[] @relation("RoleIndepartment")
+  roleUsers Role_Users[] @relation("RoleByUser")
+
+}
+model Role_Departments {
+  role_departments_Id Int @id @default(autoincrement())
+  role_Id Int
+  roledepartments Role @relation("RoleIndepartment",fields: [role_Id],references: [role_Id])
+  department_Id Int
+  departmentRole Departments @relation("DepartmentByRole",fields: [department_Id],references: [department_Id])
+  @@unique([role_Id,department_Id])
+}
+model Role_Users {
+  role_user_id Int @id @default(autoincrement())
+  role_Id Int
+  roleUsers Role @relation("RoleByUser", fields: [role_Id], references: [role_Id])
+  user_Id Int
+  UserRole User @relation("UserInRoles", fields: [user_Id], references: [user_Id])
+  @@unique([role_Id,user_Id])
+}
+
+model Authentication {
+  session_Id Int  @id @default(autoincrement())
+  user_Id Int
+  token String @unique
+  revoked Boolean @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+  authenticationUser User? @relation("UserInAuthentication", fields: [user_Id],references: [user_Id])
+   @@index([token])
+}
+
+model Before_password {
+  before_id Int @id @default(autoincrement())
+  user_Id Int
+  BeforePasswordUser User? @relation("BeforePass", fields: [user_Id], references: [user_Id])
+}
