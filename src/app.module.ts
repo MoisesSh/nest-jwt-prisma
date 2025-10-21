@@ -11,7 +11,6 @@ import { DepartmentRolesModule } from './department-roles/department-roles.modul
 import { UserDepartmentModule } from './user-department/user-department.module';
 import { AuthGuard } from './auth/guard/guard.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { BolivarModule } from './bolivar/bolivar.module';
 
 @Module({
   imports: [
@@ -22,7 +21,6 @@ import { BolivarModule } from './bolivar/bolivar.module';
     UsersRolesModule,
     DepartmentRolesModule,
     UserDepartmentModule,
-    BolivarModule,
   ],
   controllers: [AppController],
   providers: [
