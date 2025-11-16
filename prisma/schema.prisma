@@ -20,10 +20,17 @@ model User {
   lastname String
   email String @unique
   passwordHash String
+
+
   departmentUser Departments_Users[] @relation("UserInDepartment")
   UserRole Role_Users[] @relation("UserInRoles")
   authenticationUser Authentication[] @relation("UserInAuthentication")
   BeforePasswordUser Before_password[] @relation("BeforePass")
+  UserArtist Artist? @relation("UserArtist")
+  UserValoration Valorations[] @relation("UserValoration")
+  UpgradeByUser Upgrade_Users[] @relation("UpgradeByUser")
+  UserTaste Taste_Users[] @relation("UserTaste")
+
 }
 
 model Departments {
@@ -80,4 +87,57 @@ model Before_password {
   before_id Int @id @default(autoincrement())
   user_Id Int
   BeforePasswordUser User? @relation("BeforePass", fields: [user_Id], references: [user_Id])
+}
+
+
+model Artist { 
+  artist_id Int @id @default(autoincrement())
+  user_id Int @unique
+  artist_name String
+  biography String @default("")
+  web_site String @default("")
+  cost Decimal
+  UserArtist User @relation("UserArtist",fields: [user_id],references: [user_Id])
+  ArtistValoration Valorations[] @relation("ArtistValoration")
+}
+
+model Valorations {
+  valorations_id Int @id @default(autoincrement())
+  user_id Int
+  artist_id Int
+  like Int
+  comments String
+  UserValoration User @relation("UserValoration",fields: [user_id],references: [user_Id])
+  ArtistValoration Artist @relation("ArtistValoration",fields: [artist_id],references: [artist_id])
+  @@unique([user_id,artist_id])
+
+}
+
+model Upgrade { 
+  upgrade_id Int @id @default(autoincrement())
+  upgrade_name String
+  Upgrade Upgrade_Users[] @relation("Upgrade")
+}
+
+model Upgrade_Users {
+  upgrade_user_id Int @id @default(autoincrement())
+  upgrade_id Int
+  user_id Int
+  UpgradeByUser User  @relation("UpgradeByUser", fields: [user_id], references: [user_Id])
+  Upgrade Upgrade @relation("Upgrade", fields: [upgrade_id], references: [upgrade_id])
+}
+
+model Taste {
+  taste_id Int @id @default(autoincrement())
+  taste_name String
+  Taste Taste_Users[] @relation("Taste")
+}
+
+model Taste_Users {
+  taste_user_id Int @id @default(autoincrement())
+  taste_id Int
+  user_id Int
+  Taste Taste @relation("Taste", fields: [taste_id], references: [taste_id])
+  UserTaste User @relation("UserTaste", fields: [user_id], references: [user_Id])
+  @@unique([taste_id,user_id])
 }
