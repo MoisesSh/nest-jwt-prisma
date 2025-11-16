@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateAuthDto, singInAuthDto } from './dto/create-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { hashToken } from './token.utils';
 import { Request, Response } from 'express';
+import { buildResponse } from 'src/common/response.helper';
+import { CreateAuthDto, singInAuthDto} from './dto/create-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,13 +15,13 @@ export class AuthService {
   ) {}
   async singIn(
     singInAuthDto: singInAuthDto,
-  ): Promise<{id:number, access_token: string }> {
+  ) {
     const { email, password } = singInAuthDto;
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
     if (!user) {
-      throw new HttpException('Usuario no encontrado', HttpStatus.UNAUTHORIZED);
+      return buildResponse("Usuario no encontrado", HttpStatus.NOT_FOUND)
     }
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
@@ -37,7 +38,8 @@ export class AuthService {
       },
     });
     return {
-      id: user.user_Id,
+      status: HttpStatus.OK,
+      user: payload,
       access_token: token,
     };
   }
@@ -54,19 +56,22 @@ export class AuthService {
       },
     });
     if (!singUpUser) {
-      throw new HttpException(
+      return buildResponse(
         'Error al crear el usuario',
         HttpStatus.BAD_REQUEST,
       );
     }
-    return singUpUser;
+    return buildResponse(
+      'Usuario Creado Exitosamente',
+      HttpStatus.CREATED,
+    );;
   }
   async findOne(id: number) {
     const oneUser = await this.prisma.user.findUnique({
       where: { user_Id: id },
     });
     if (!oneUser) {
-      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+      return buildResponse('Usuario no encontrado', HttpStatus.NOT_FOUND);
     }
     return oneUser;
   }
@@ -86,13 +91,13 @@ export class AuthService {
         },
       });
       if (!oldToken) {
-        throw new HttpException('El token no existe', HttpStatus.NOT_FOUND);
+        return buildResponse('El token no existe', HttpStatus.NOT_FOUND);
       }
       if (!oldToken.authenticationUser) {
-        throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+        return buildResponse('Usuario no existe', HttpStatus.NOT_FOUND);
       }
       if (oldToken.revoked) {
-        throw new HttpException('Token revocado', HttpStatus.UNAUTHORIZED);
+        return buildResponse('Token revocado', HttpStatus.UNAUTHORIZED);
       }
       const newPayload = {
         name: oldToken.authenticationUser.name,
@@ -131,7 +136,7 @@ export class AuthService {
     });
 
     if (!existing) {
-      throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
+      return buildResponse('Token no encontrado', HttpStatus.NOT_FOUND);
     }
 
     const isRevoked = await this.prisma.authentication.update({
@@ -143,7 +148,7 @@ export class AuthService {
       },
     });
     if (!isRevoked) {
-      throw new HttpException('Token no encontrado', HttpStatus.NOT_FOUND);
+      return buildResponse('Token no encontrado', HttpStatus.NOT_FOUND);
     }
     return response.status(204).send();
   }

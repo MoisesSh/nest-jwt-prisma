@@ -10,6 +10,11 @@ import { DepartmentRolesModule } from './department-roles/department-roles.modul
 import { UserDepartmentModule } from './user-department/user-department.module';
 import { AuthGuard } from './auth/guard/guard.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { UserModule } from './user/user.module';
+import { ArtistModule } from './artist/artist.module';
+import { ValorationsModule } from './valorations/valorations.module';
+import { TasteModule } from './taste/taste.module';
+import { TasteByUserModule } from './taste-by-user/taste-by-user.module';
 
 @Module({
   imports: [
@@ -19,6 +24,11 @@ import { APP_GUARD } from '@nestjs/core';
     UsersRolesModule,
     DepartmentRolesModule,
     UserDepartmentModule,
+    UserModule,
+    ArtistModule,
+    ValorationsModule,
+    TasteModule,
+    TasteByUserModule,
   ],
   controllers: [AppController],
   providers: [
